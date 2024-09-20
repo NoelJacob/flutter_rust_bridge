@@ -676,31 +676,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 }
 
-// Section: extra_from_parser
-
-Future<void> runRustApp({
-  required Widget Function(RustState state) body,
-  required RustState Function() state,
-}) async {
-  await RustLib.init();
-  runApp(_MyApp(body: body, state: state()));
-}
-
-// improve typing later
-class _MyApp extends StatefulWidget {
-  final Widget Function(RustState state) body;
+abstract class RustWidget extends StatefulWidget {
   final RustState state;
 
-  const _MyApp({
-    required this.body,
-    required this.state,
-  });
+  const RustWidget({super.key, required this.state});
 
   @override
-  State<_MyApp> createState() => _MyAppState();
+  State<RustWidget> createState() => _RustWidgetState();
+
+  Widget build(BuildContext context);
 }
 
-class _MyAppState extends State<_MyApp> {
+class _RustWidgetState extends State<RustWidget> {
   late final BaseRustState baseState;
 
   @override
@@ -720,15 +707,7 @@ class _MyAppState extends State<_MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // We can allow users to customize MaterialApp/Scaffold by exposing another argument
-    // like `Widget Function() app`; but for simplicity let's customize the `body` by default.
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: Scaffold(body: widget.body(widget.state)),
-    );
+    return widget.build(context);
   }
 }
 
