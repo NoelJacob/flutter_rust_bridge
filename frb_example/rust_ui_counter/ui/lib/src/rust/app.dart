@@ -18,3 +18,16 @@ abstract class RustState implements RustOpaqueInterface {
 
   void setBaseState({required BaseRustState baseState});
 }
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<RustState2>>
+abstract class RustState2 implements RustOpaqueInterface {
+  int get count;
+
+  set count(int count);
+
+  void increment();
+
+  factory RustState2() => RustLib.instance.api.crateAppRustState2New();
+
+  void setBaseState({required BaseRustState baseState});
+}

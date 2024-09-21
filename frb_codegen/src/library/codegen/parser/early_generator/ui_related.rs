@@ -77,30 +77,18 @@ impl BaseRustState {
 fn generate_dart_boilerplate() -> String {
     r###"
 import 'package:flutter/material.dart';
-
-Future<void> runRustApp({
-  required Widget Function(RustState state) body,
-  required RustState Function() state,
-}) async {
-  await RustLib.init();
-  runApp(_MyApp(body: body, state: state()));
-}
-
-// improve typing later
-class _MyApp extends StatefulWidget {
-  final Widget Function(RustState state) body;
+abstract class RustWidget extends StatefulWidget {
   final RustState state;
 
-  const _MyApp({
-    required this.body,
-    required this.state,
-  });
+  const RustWidget({super.key, required this.state});
 
   @override
-  State<_MyApp> createState() => _MyAppState();
+  State<RustWidget> createState() => _RustWidgetState();
+
+  Widget build(BuildContext context);
 }
 
-class _MyAppState extends State<_MyApp> {
+class _RustWidgetState extends State<RustWidget> {
   late final BaseRustState baseState;
 
   @override
@@ -120,71 +108,7 @@ class _MyAppState extends State<_MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // We can allow users to customize MaterialApp/Scaffold by exposing another argument
-    // like `Widget Function() app`; but for simplicity let's customize the `body` by default.
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: Scaffold(body: widget.body(widget.state)),
-    );
-  }
-}
-
-/// Adapted from https://github.com/mobxjs/mobx.dart/issues/750
-// TODO: Move to support library instead of inlining here
-class SyncTextField extends StatefulWidget {
-  final String text;
-
-  // forward
-  final ValueChanged<String>? onChanged;
-  final InputDecoration? decoration;
-  final ValueChanged<String>? onSubmitted;
-
-  const SyncTextField({
-    super.key,
-    required this.text,
-    this.onChanged,
-    this.decoration,
-    this.onSubmitted,
-  });
-
-  @override
-  State<SyncTextField> createState() => _SyncTextFieldState();
-}
-
-class _SyncTextFieldState extends State<SyncTextField> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController();
-    _controller.text = widget.text;
-  }
-
-  @override
-  void didUpdateWidget(covariant SyncTextField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.text != widget.text) _controller.text = widget.text;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: _controller,
-      // forward
-      onChanged: widget.onChanged,
-      decoration: widget.decoration,
-      onSubmitted: widget.onSubmitted,
-    );
+    return widget.build(context);
   }
 }
     "###

@@ -20,3 +20,22 @@ impl RustState {
         self.count += 1;
     }
 }
+
+#[frb(ui_state)]
+pub struct RustState2 {
+    pub count: i32,
+}
+
+impl RustState2 {
+    pub fn new() -> Self {
+        Self {
+            count: 100,
+            base_state: Default::default(),
+        }
+    }
+
+    #[frb(ui_mutation)]
+    pub fn increment(&mut self) {
+        self.count += 1;
+    }
+}
